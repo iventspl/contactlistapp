@@ -3,5 +3,5 @@ from . import views
 
 app_name = 'contacts'
 urlpatterns = [
-    path('', views.home, name='home' ),
+    path('', views.contacts_list, name='contacts_list'),
 ]

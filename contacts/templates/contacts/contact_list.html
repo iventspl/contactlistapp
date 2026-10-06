@@ -3,9 +3,10 @@
 {% block content %}
     <h2>Contact List:</h2>
     <ul>
-        <li>Adam</li>
-        <li>david</li>
-        <li>ola</li>
-        <li>cola</li>
+        {% for contact in contacts %}
+            <li>{{ contact.first_name }}</li>
+        {% empty %}
+            <p>No contacts</p>
+        {% endfor %}
     </ul>
 {% endblock content %}
