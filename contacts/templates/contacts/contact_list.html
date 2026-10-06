@@ -1,8 +1,7 @@
 {% extends 'contacts/base.html' %}
-{% block title %}{% endblock title %}
 
 {% block content %}
-    <!-- Header -->
+    {# Header #}
      <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
         <h1 class="h3 mb-0">
             Contacts <span class="badge text-bg-secondary align-middle">{{ contacts|length }}</span>
@@ -13,13 +12,13 @@
         </div>
      </div>
 
-     <!-- Search -->
+     {# Search #}
      <form method="get" class="mb-4" role="search">
         <div class="input-group">
-            <!-- todo keep current seach phrase -->
+            {# todo keep current search phrase #}
             <input class="form-control" name="q" type="search" placeholder="Search by name, email or city" aria-label="Search contacts" value="">
             <button class="btn btn-outline-primary" type="submit">Search</button>
-            <!-- todo add clear link shown when search is active -->
+            {# todo add clear link shown when search is active #}
         </div>
      </form>
 
@@ -27,13 +26,13 @@
         <table class="table table-hover align-middle">
             <thead class="table-light">
                 <tr>
-                    <td scope="col">Name</td>
-                    <td scope="col">Contact</td>
-                    <td scope="col">City</td>
-                    <td scope="col">Status</td>
-                    <td scope="col">Added</td>
-                    <td scope="col">Weather</td>
-                    <td scope="col" class="text-end">Actions</td>
+                    <th scope="col">Name</th>
+                    <th scope="col">Contact</th>
+                    <th scope="col">City</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Added</th>
+                    <th scope="col">Weather</th>
+                    <th scope="col" class="text-end">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -48,17 +47,19 @@
                         <td><span class="badge text-bg-light border">{{ contact.status }}</span></td>
                         <td class="text-nowrap">{{ contact.created_on|date:"d.m.Y H:i" }}</td>
                         <td class="small text-body-secondary">pogoda</td>
-                        <td class="text-end text-nowrap">
+                        <td class="text-end text-nowrap ">
                             <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
-                            <!-- delete as form post with csrf not link -->
-                            <a href="#" class="btn btn-sm btn-outline-danger">Delete</a> 
+                            <form class="d-inline" data-confirm="Are you sure that you want to delete this contact?" method="post" action="{% url 'contacts:contact_delete' contact.id %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-danger">Delete</button>
+                            </form>
                         </td>
                     </tr>
                 {% empty %}
                     <tr>
                         <td colspan="7" class="text-center text-body-secondary py-5">
-                            <!-- todo different message for no result and no contacts -->
-                            No contacts yes. Add a new one!
+                            {# todo different message for no result and no contacts #}
+                            No contacts yet. Add a new one!
                         </td>
                     </tr>
                 {% endfor %}
