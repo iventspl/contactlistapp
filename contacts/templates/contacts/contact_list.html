@@ -1,12 +1,68 @@
 {% extends 'contacts/base.html' %}
+{% block title %}{% endblock title %}
 
 {% block content %}
-    <h2>Contact List:</h2>
-    <ul>
-        {% for contact in contacts %}
-            <li>{{ contact.first_name }}</li>
-        {% empty %}
-            <p>No contacts</p>
-        {% endfor %}
-    </ul>
+    <!-- Header -->
+     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+        <h1 class="h3 mb-0">
+            Contacts <span class="badge text-bg-secondary align-middle">{{ contacts|length }}</span>
+        </h1>
+        <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary" href="#">Import CSV</a>
+            <a class="btn btn-primary" href="#">Add Contact</a>
+        </div>
+     </div>
+
+     <!-- Search -->
+     <form method="get" class="mb-4" role="search">
+        <div class="input-group">
+            <!-- todo keep current seach phrase -->
+            <input class="form-control" name="q" type="search" placeholder="Search by name, email or city" aria-label="Search contacts" value="">
+            <button class="btn btn-outline-primary" type="submit">Search</button>
+            <!-- todo add clear link shown when search is active -->
+        </div>
+     </form>
+
+     <div class="table-responsive">
+        <table class="table table-hover align-middle">
+            <thead class="table-light">
+                <tr>
+                    <td scope="col">Name</td>
+                    <td scope="col">Contact</td>
+                    <td scope="col">City</td>
+                    <td scope="col">Status</td>
+                    <td scope="col">Added</td>
+                    <td scope="col">Weather</td>
+                    <td scope="col" class="text-end">Actions</td>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contact in contacts %}
+                    <tr>
+                        <td class="fw-semibold">{{ contact.last_name }} {{ contact.first_name }}</td>
+                        <td>
+                            <a href="mailto:{{ contact.email }}" class="d-block">{{ contact.email }}</a>
+                            <a href="tel:{{ contact.phone_number }}" class="small text-body-secondary">{{ contact.phone_number }}</a>
+                        </td>
+                        <td>{{ contact.city }}</td>
+                        <td><span class="badge text-bg-light border">{{ contact.status }}</span></td>
+                        <td class="text-nowrap">{{ contact.created_on|date:"d.m.Y H:i" }}</td>
+                        <td class="small text-body-secondary">pogoda</td>
+                        <td class="text-end text-nowrap">
+                            <a href="#" class="btn btn-sm btn-outline-secondary">Edit</a>
+                            <!-- delete as form post with csrf not link -->
+                            <a href="#" class="btn btn-sm btn-outline-danger">Delete</a> 
+                        </td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-body-secondary py-5">
+                            <!-- todo different message for no result and no contacts -->
+                            No contacts yes. Add a new one!
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+     </div>
 {% endblock content %}
