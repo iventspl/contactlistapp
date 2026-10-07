@@ -5,21 +5,46 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
-from .csv_import import CsvImportError, import_contacts
+from django.db.models import Q
 
+from .csv_import import CsvImportError, import_contacts
 from .models import Contact
 from .forms import ContactForm, CsvImportForm
 from .weather import get_weather_for_city
 
 logger = logging.getLogger(__name__)
 
-def contacts_list(request):
-    contacts = Contact.objects.select_related('status').order_by('-created_on')
-    context = {
-        'contacts': contacts,
-    }
-    return render(request, 'contacts/contact_list.html', context)
+SORT_OPTIONS = {
+    "last_name": ("last_name", "first_name"),
+    "-last_name": ("-last_name", "-first_name"),
+    "created_on": ("created_on",),
+    "-created_on": ("-created_on",),
+}
+DEFAULT_SORT = "-created_on"
 
+
+def contacts_list(request):
+    query = request.GET.get("q", "").strip()
+    sort = request.GET.get("sort", DEFAULT_SORT)
+    if sort not in SORT_OPTIONS:
+        sort = DEFAULT_SORT
+
+    contacts = Contact.objects.select_related("status").order_by(*SORT_OPTIONS[sort])
+    if query:
+        contacts = contacts.filter(
+            Q(first_name__icontains=query)
+            | Q(last_name__icontains=query)
+            | Q(email__icontains=query)
+            | Q(phone_number__icontains=query)
+            | Q(city__icontains=query)
+        )
+
+    context = {
+        "contacts": contacts,
+        "query": query,
+        "sort": sort,
+    }
+    return render(request, "contacts/contact_list.html", context)
 
 @require_POST
 def contact_delete(request, pk):

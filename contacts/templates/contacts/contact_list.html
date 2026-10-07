@@ -14,23 +14,36 @@
 
      {# Search #}
      <form method="get" class="mb-4" role="search">
+        <input type="hidden" name="sort" value="{{ sort }}">
         <div class="input-group">
-            {# todo keep current search phrase #}
-            <input class="form-control" name="q" type="search" placeholder="Search by name, email or city" aria-label="Search contacts" value="">
+            <input class="form-control" name="q" type="search" value="{{ query }}"
+                placeholder="Search by name, email, phone or city" aria-label="Search contacts">
             <button class="btn btn-outline-primary" type="submit">Search</button>
-            {# todo add clear link shown when search is active #}
+            {% if query %}
+                <a class="btn btn-outline-secondary" href="?sort={{ sort }}">Clear</a>
+            {% endif %}
         </div>
-     </form>
+    </form>
 
      <div class="table-responsive">
         <table class="table table-hover align-middle" data-weather-url="{% url 'contacts:city_weather' %}">
             <thead class="table-light">
                 <tr>
-                    <th scope="col">Name</th>
+                    <th scope="col" {% if sort == 'last_name' %}aria-sort="ascending"{% elif sort == '-last_name' %}aria-sort="descending"{% endif %}>
+                        <a class="link-body-emphasis text-decoration-none"
+                        href="?sort={% if sort == 'last_name' %}-last_name{% else %}last_name{% endif %}{% if query %}&q={{ query|urlencode }}{% endif %}">
+                            Name {% if sort == 'last_name' %}▲{% elif sort == '-last_name' %}▼{% endif %}
+                        </a>
+                    </th>                    
                     <th scope="col">Contact</th>
                     <th scope="col">City</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Added</th>
+                    <th scope="col" {% if sort == 'created_on' %}aria-sort="ascending"{% elif sort == '-created_on' %}aria-sort="descending"{% endif %}>
+                        <a class="link-body-emphasis text-decoration-none"
+                        href="?sort={% if sort == '-created_on' %}created_on{% else %}-created_on{% endif %}{% if query %}&q={{ query|urlencode }}{% endif %}">
+                            Added {% if sort == 'created_on' %}▲{% elif sort == '-created_on' %}▼{% endif %}
+                        </a>
+                    </th>
                     <th scope="col">Weather</th>
                     <th scope="col" class="text-end">Actions</th>
                 </tr>
@@ -62,8 +75,11 @@
                 {% empty %}
                     <tr>
                         <td colspan="7" class="text-center text-body-secondary py-5">
-                            {# todo different message for no result and no contacts #}
-                            No contacts yet. Add a new one!
+                            {% if query %}
+                                No contacts match "{{ query }}".
+                            {% else %}
+                                No contacts yet. Add a new one!
+                            {% endif %}
                         </td>
                     </tr>
                 {% endfor %}
