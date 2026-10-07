@@ -1,8 +1,16 @@
-from django.shortcuts import render, get_object_or_404, redirect
+import logging
+
+import requests
 from django.contrib import messages
-from django.views.decorators.http import require_POST, require_http_methods
+from django.http import JsonResponse
+from django.shortcuts import render, get_object_or_404, redirect
+from django.views.decorators.http import require_POST, require_GET, require_http_methods
+
 from .models import Contact
 from .forms import ContactForm
+from .weather import get_weather_for_city
+
+logger = logging.getLogger(__name__)
 
 def contacts_list(request):
     contacts = Contact.objects.select_related('status').order_by('-created_on')
@@ -54,3 +62,22 @@ def contact_edit(request, pk):
         'page': 'Edit',
     }
     return render(request, 'contacts/contact_form.html', context)
+
+
+@require_GET
+def city_weather(request):
+    """Return current weather for the 'city' query parameter as JSON"""
+    city = request.GET.get("city", "").strip()
+    if not city:
+        return JsonResponse({"error": "Missing 'city' parameter."}, status=400)
+
+    try:
+        weather = get_weather_for_city(city)
+    except requests.RequestException:
+        logger.exception("Weather lookup failed for city %r", city)
+        return JsonResponse({"error": "Weather service unavailable."}, status=502)
+
+    if weather is None:
+        return JsonResponse({"error": "City not found."}, status=404)
+
+    return JsonResponse(weather)
