@@ -23,10 +23,10 @@
                     <li class="nav-item">
                         <a class="nav-link {% if url_name == 'contacts_list' %}active{% endif %}" {% if url_name == 'contacts_list' %}aria-current="page"{% endif %} href="{% url 'contacts:contacts_list' %}">Contacts</a>
                     </li>
-                    {% endwith %}
                     <li class="nav-item">
-                        <a class="nav-link" href="#">Add contact</a>
+                        <a class="nav-link {% if url_name == 'contact_add' %}active{% endif %} " href="{% url 'contacts:contact_add' %}">Add contact</a>
                     </li>
+                    {% endwith %}
                     <li class="nav-item">
                         <a class="nav-link" href="#">Import CSV</a>
                     </li>
