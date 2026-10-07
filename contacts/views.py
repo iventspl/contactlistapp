@@ -5,9 +5,10 @@ from django.contrib import messages
 from django.http import JsonResponse
 from django.shortcuts import render, get_object_or_404, redirect
 from django.views.decorators.http import require_POST, require_GET, require_http_methods
+from .csv_import import CsvImportError, import_contacts
 
 from .models import Contact
-from .forms import ContactForm
+from .forms import ContactForm, CsvImportForm
 from .weather import get_weather_for_city
 
 logger = logging.getLogger(__name__)
@@ -81,3 +82,27 @@ def city_weather(request):
         return JsonResponse({"error": "City not found."}, status=404)
 
     return JsonResponse(weather)
+
+
+@require_http_methods(['POST', 'GET'])
+def contact_import(request):
+    if request.method == 'POST':
+        form = CsvImportForm(request.POST, request.FILES)
+        if form.is_valid():
+            try:
+                imported_count, errors = import_contacts(form.cleaned_data['file'])
+            except CsvImportError as error:
+                form.add_error('file', str(error))
+            else:
+                if not errors:
+                    messages.success(request, f"Imported {imported_count} contacts.")
+                    return redirect('contacts:contacts_list')
+                context = {
+                    'form': CsvImportForm(),
+                    'imported_count': imported_count,
+                    'errors': errors,
+                }
+                return render(request, 'contacts/contact_import.html', context)
+    else:
+        form = CsvImportForm()
+    return render(request, 'contacts/contact_import.html', {'form': form})

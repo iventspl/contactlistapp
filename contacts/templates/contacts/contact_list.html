@@ -7,7 +7,7 @@
             Contacts <span class="badge text-bg-secondary align-middle">{{ contacts|length }}</span>
         </h1>
         <div class="d-flex gap-2">
-            <a class="btn btn-outline-secondary" href="#">Import CSV</a>
+            <a class="btn btn-outline-secondary" href="{% url 'contacts:contact_import' %}">Import CSV</a>
             <a class="btn btn-primary" href="{% url 'contacts:contact_add' %}">Add Contact</a>
         </div>
      </div>
