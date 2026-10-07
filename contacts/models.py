@@ -1,5 +1,10 @@
+from django.core.validators import RegexValidator
 from django.db import models
 
+phone_validator = RegexValidator(
+    regex=r"^\+?\d{9,15}$",
+    message="Enter 9 to 15 digits, optionally starting with +",
+)
 
 class ContactStatus(models.Model):
     status = models.CharField(max_length=50, unique=True)
@@ -11,7 +16,7 @@ class ContactStatus(models.Model):
 class Contact(models.Model):
     first_name = models.CharField(max_length=255)
     last_name = models.CharField(max_length=255)
-    phone_number = models.CharField(max_length=15, unique=True)
+    phone_number = models.CharField(max_length=16, unique=True, validators=[phone_validator])
     email = models.EmailField(max_length=255, unique=True)
     city = models.CharField(max_length=255)
     created_on = models.DateTimeField(auto_now_add=True)

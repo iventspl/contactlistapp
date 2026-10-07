@@ -1,5 +1,5 @@
 {% extends 'contacts/base.html' %}
-{% load crispy_forms_tags %}
+{% load static crispy_forms_tags %}
 {% block title %}{{ page }} Contact - ContactList{% endblock title%}
 {% block content %}
     <div class="row justify-content-center">
@@ -7,7 +7,7 @@
             <h1 class="h3 mb-4">{{ page }} contact</h1>
             <div class="card shadow-sm">
                 <div class="card-body p-4">
-                   <form method="post">
+                   <form method="post" data-validate>
                         {% csrf_token %}
                         {{ form|crispy }}
                         <div class="d-flex justify-content-end gap-2 mt-4">
@@ -20,3 +20,7 @@
         </div>
     </div>
 {% endblock content %}
+
+{% block extra_js %}
+    <script src="{% static 'contacts/js/form-validation.js' %}"></script>
+{% endblock extra_js %}
